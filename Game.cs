@@ -7,19 +7,23 @@ namespace DungeonExplorer
     {
         private Player player;
         private Room currentRoom;
+        private Random random =  new Random();
 
         public Game()
         {
-            // Initialize the game with one room and one player
+            Console.WriteLine("Enter player name: ");
+            string playerName = Console.ReadLine();
+            player = new Player(playerName, 100);
+            currentRoom = new Room("You are in an empty room.\n There is");
+            
 
         }
         public void Start()
         {
-            // Change the playing logic into true and populate the while loop
-            bool playing = false;
+            bool playing = true;
             while (playing)
             {
-                // Code your playing logic here
+                // generate room
             }
         }
     }
