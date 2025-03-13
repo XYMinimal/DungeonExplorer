@@ -7,23 +7,38 @@ namespace DungeonExplorer
         public string Name { get; private set; }
         public int Health { get; private set; }
         public Weapon Weapon { get; set; }
-        public Armour Armor { get; set; }
-        private List<string> _inventory = new List<string>();
+        public int Armor { get; set; }
+        private List<Item> _inventory = new List<Item>();
+        private int treasureCount = 0;
+        public float DamageModifier { get; private set; }
 
         public Player(string name, int health) 
         {
             Name = name;
             Health = health;
         }
-        public void PickUpItem(string item)
+        public void PickUpItem(Item item)
         {
             _inventory.Add(item);
         }
-        public string InventoryContents()
+        public List<Item> InventoryContents()
         {
-            return string.Join(", ", _inventory);
+            return _inventory;
         }
-        
-        publ
+
+        public void addTreasure()
+        {
+            treasureCount++;
+        }
+
+        public void setDamageModifier(float modifier)
+        {
+            DamageModifier = modifier;
+        }
+
+        public void setHealth(int health)
+        {
+            Health = health;
+        }
     }
 }

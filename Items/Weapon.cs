@@ -15,7 +15,7 @@
 
         private int calculateDamage(int armour)
         {
-            return armour * 10;
+            return damage - armour;
         }
     }
 }

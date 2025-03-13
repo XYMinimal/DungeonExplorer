@@ -1,4 +1,6 @@
-﻿namespace DungeonExplorer
+﻿using System;
+
+namespace DungeonExplorer
 {
     public class Enemy
     {
@@ -17,5 +19,12 @@
         }
         
         public string getName() { return name; }
+
+        public int takeDamage(int damage)
+        {
+            int taken = Math.Max(damage - armour, 0);
+            health -= taken;
+            return taken;
+        }
     }
 }
