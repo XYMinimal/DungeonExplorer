@@ -111,7 +111,7 @@ namespace DungeonExplorer
             Console.WriteLine("You find item(s) in the room: \t");
             foreach (Item item in room.getItems())
             {
-                Console.WriteLine($"\t{item.getName()}");
+                Console.WriteLine($"\t{item.GetName()}");
             }
         }
         
@@ -135,7 +135,7 @@ namespace DungeonExplorer
                     bool invalid = true;
                     int choice = 1;
                     Console.WriteLine($"Your Health: {_player.Health}\tEnemy Health: {room.Enemy.health}\n\nWhat do you use: \n" +
-                                      $"{string.Join(", ", _player.InventoryContents().Select(p => p.getName()))}");
+                                      $"{string.Join(", ", _player.InventoryContents().Select(p => p.GetName()))}");
 
                     while (invalid)
                     {
@@ -213,7 +213,7 @@ namespace DungeonExplorer
 
                     foreach (Item item in items)
                     {
-                        if (item.getName() == "Armour")
+                        if (item.GetName() == "Armour")
                         {
                             _player.Armor += 4;
                         }
