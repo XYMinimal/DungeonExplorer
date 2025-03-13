@@ -16,16 +16,19 @@ namespace DungeonExplorer
             { "Legendary", 0.02f }
         };
 
-        public static String generateRarity()
+        public static KeyValuePair<int, string> generateRarity()
         {
             float f = (float)_random.NextDouble();
+            int x = 0;
             foreach (KeyValuePair<string, float> entry in lootTable)
             {
                 f -= entry.Value;
                 if (f <= 0)
                 {
-                    return entry.Key;
+                    return new KeyValuePair<int, string>(x, entry.Key);
                 }
+
+                x++;
             }
             throw new Exception("Rarity doesn't exist");
         }

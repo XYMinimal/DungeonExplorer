@@ -6,6 +6,8 @@ namespace DungeonExplorer
     {
         public string Name { get; private set; }
         public int Health { get; private set; }
+        public Weapon Weapon { get; set; }
+        public Armour Armor { get; set; }
         private List<string> _inventory = new List<string>();
 
         public Player(string name, int health) 
@@ -21,5 +23,7 @@ namespace DungeonExplorer
         {
             return string.Join(", ", _inventory);
         }
+        
+        publ
     }
 }

@@ -5,17 +5,15 @@
         private int damage;
         private string type;
         
-        public Weapon(string name, string description, int damage, string type) : base(name, description)
+        public Weapon(string name, int damage) : base(name)
         {
             this.damage = damage;
-            this.type = type;
             
         }
 
         public int getDamage() { return damage; }
-        public string getType() { return type; }
 
-        private int calculateDamage(int armour, string type)
+        private int calculateDamage(int armour)
         {
             return armour * 10;
         }

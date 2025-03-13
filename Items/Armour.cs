@@ -3,7 +3,7 @@
     public class Armour : Item
     {
         private readonly int armour;
-        public Armour(string name, string description, int armour) : base(name, description)
+        public Armour(string name, int armour) : base(name)
         {
             this.armour = armour;
         }
