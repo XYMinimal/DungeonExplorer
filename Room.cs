@@ -14,6 +14,7 @@ namespace DungeonExplorer
 
         public Room(string description, int pathCount)
         {
+            _items = new List<Item>();
             this.pathCount = pathCount;
             this._description = description + $"\nThere are {pathCount} paths: ";
             for (int i = 0; i < pathCount; i++)
@@ -30,12 +31,17 @@ namespace DungeonExplorer
 
         public void addItem(Item item)
         {
-            this._items.Add(item);
+            _items.Add(item);
         }
 
         public List<string> getPaths()
         {
             return _paths.Take(pathCount).ToList();
+        }
+
+        public List<Item> getItems()
+        {
+            return _items;
         }
         
     }

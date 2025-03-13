@@ -37,15 +37,16 @@ namespace DungeonExplorer
             Console.WriteLine("Enter player name: ");
             string playerName = Console.ReadLine();
             _player = new Player(playerName, 100);
+            _player.PickUpItem(new Weapon("Common Sword", 5));
             _depth = 0;
             _currentRoom = new Room("You are in an empty room.\n There is", 3);
             
 
         }
         // Main function for creating rooms, items and enemies
-        public Room generateRoom()
+        private Room GenerateRoom()
         {
-            Room room = new Room("", 0);
+            Room room = new Room("", _random.Next(2) + 1);
             // This code determines if the player has found an exit, the chance increases the more rooms you explore
             bool escape = _random.Next(100) < (5 * Math.Log(_depth));
             if (escape)
@@ -58,7 +59,7 @@ namespace DungeonExplorer
             bool enemySpawn = _random.Next(100) < 50;
             if (enemySpawn)
             {
-                double health = Math.Floor(Math.Pow(_depth, _random.Next(8, 14) / 10.0)
+                double health = Math.Floor(Math.Pow(_depth + 3, _random.Next(8, 14) / 10.0));
                 int intHealth = (int) Math.Floor(health);
                 Enemy enemy = new Enemy(
                     _enemies[_random.Next(_enemies.Length)],
@@ -89,10 +90,10 @@ namespace DungeonExplorer
                             break;
                         case "Potion":
                             string potionType = potionTypes[_random.Next(potionTypes.Length)];
-                            room.addItem(new Item(potionType + "Potion");
+                            room.addItem(new Item(potionType + "Potion"));
                             break;
                         case "Treasure":
-                            _player.addTreasure();
+                            _player.AddTreasure();
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -107,6 +108,12 @@ namespace DungeonExplorer
         public void printInfo(Room room)
         {
             Console.WriteLine($"Name: {_player.Name}\tHealth: {_player.Health}\nInfo: {room.getDescription()}");
+            if (room.getItems().Count == 0) {return;}
+            Console.WriteLine("You find item(s) in the room: \t");
+            foreach (Item item in room.getItems())
+            {
+                Console.WriteLine($"\t{item.getName()}");
+            }
         }
         
         
@@ -115,18 +122,19 @@ namespace DungeonExplorer
             bool playing = true;
             while (playing)
             {
-                Room room = generateRoom();
+                Room room = GenerateRoom();
                 if (room.getDescription() == "")
                 {
                     playing = false;
                     return;
                 }
                 printInfo(room);
+                if (room.Enemy != null) {  Console.WriteLine($"You have encountered a {room.Enemy.name}"); }
                 while (room.Enemy != null)
                 {
                     bool invalid = true;
                     int choice = 1;
-                    Console.WriteLine($"You have encountered a {room.Enemy.name}\n\nWhat do you use: \n" +
+                    Console.WriteLine($"Your Health: {_player.Health}\tEnemy Health: {room.Enemy.health}\n\nWhat do you use: \n" +
                                       $"{string.Join(", ", _player.InventoryContents().Select(p => p.getName()))}");
 
                     while (invalid)
@@ -135,16 +143,17 @@ namespace DungeonExplorer
                         if (choice <= 0 || choice > _player.InventoryContents().Count)
                         {
                             Console.WriteLine("Invalid choice. Try again.");
+                            continue;
                         }
                         invalid = false;    
                     }
                     
-                    Item chosen =  _player.InventoryContents()[choice];
+                    Item chosen =  _player.InventoryContents()[choice - 1];
                     if (chosen.GetType() == typeof(Weapon))
                     {
                         Weapon weapon = (Weapon)chosen;
                         int taken = room.Enemy.takeDamage(
-                            (int) Math.Floor(weapon.getDamage() * (1 + _player.damageModifier)));
+                            (int) Math.Floor(weapon.getDamage() * (1 + _player.GetDamageModifier())));
                         Console.WriteLine($"You attack and the enemy loses {taken} health!");
                     }
                     else if (chosen.GetType() == typeof(Potion))
@@ -153,17 +162,70 @@ namespace DungeonExplorer
                         if (potion.Type == "Health")
                         {
                             int healed = Math.Min(100 - _player.Health, 50);
-                            _player.setHealth(healed);
+                            _player.SetHealth(healed);
                             Console.WriteLine($"You drank a Health Potion and healed {healed} health!");
                         }
                         else if (potion.Type == "Strength")
                         {
-                            _player.setDamageModifier(_player.damageModifier += 0.5);
+                            _player.SetDamageModifier(_player.GetDamageModifier() + 0.5f);
+                            Console.WriteLine("You drank a Strength Potion and will do more damage until the fight ends!");
                         }
                     }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException();
+                    }
+
+                    if (room.Enemy.health <= 0)
+                    {
+                        Console.WriteLine("You have defeated the " + room.Enemy.name);
+                        room.Enemy = null;
+                        break;
+                    }
+                    
+                    int dealt = Math.Max(room.Enemy.damage - _player.Health, 0);
+                    Console.WriteLine($"The enemy attacks and deals {dealt} damage!\n");
                    
                     
                 }
+                
+                List<Item>  items = room.getItems();
+                Console.WriteLine("What do you want to do?");
+                bool invalidChoice = true;
+                if (items.Count != 0)
+                {
+                    Console.WriteLine("1. Pick up items\n: ");
+                    while (invalidChoice)
+                    {
+                        int choice = int.TryParse(Console.ReadLine(), out choice) ? choice : 0;
+                        if (choice != 1)
+                        {
+                            Console.WriteLine("Invalid choice. Try again.");
+                            continue;
+                        }
+                        invalidChoice = false;
+                    }
+
+                    foreach (Item item in items)
+                    {
+                        _player.PickUpItem(item);
+                    }
+                }
+                
+                printInfo(room);
+                Console.WriteLine("Where would you like to go? : ");
+                bool invalidX = true;
+                while (invalidX)
+                {
+                    int choice = int.TryParse(Console.ReadLine(), out choice) ? choice : 0;
+                    if (choice < 0 || choice > room.getItems().Count)
+                    {
+                        Console.WriteLine("Invalid choice. Try again.");
+                        continue;
+                    }
+                    invalidX = false;
+                }
+                
                 
 
 
