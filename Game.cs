@@ -1,34 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using DungeonExplorer.Items;
 
 namespace DungeonExplorer
 {
     internal class Game
     {
-        private Player _player;
-        private Room _currentRoom;
+        private readonly Player _player;
         private readonly Random _random =  new Random();
+
+        private bool _playing = true;
         // depth is used to increase difficulty and escape chance as game progresses
         private int _depth;
         // List of possible enemy names, in a bigger project this would be store in a separate file
-        private String[] _enemies = new String[]
-        {
+        private readonly string[] _enemies = {
             "Evil Bat", 
             "Zombie", 
             "Giant Spider", 
             "Living Ooze"
         };
-
-        private string[] itemTypes = new string[]
-        {
+        // List of possible items you can find
+        private readonly string[] _itemTypes = {
             "Weapon", "Armour", "Potion", "Treasure"
         };
-
-        private string[] potionTypes = new String[]
-        {
-            "Health", "Strength", "Fortitude"
+        // List of possible potion types
+        private readonly string[] _potionTypes = {
+            "Health", "Strength"
         };
 
         public Game()
@@ -39,7 +37,6 @@ namespace DungeonExplorer
             _player = new Player(playerName, 100);
             _player.PickUpItem(new Weapon("Common Sword", 5));
             _depth = 0;
-            _currentRoom = new Room("You are in an empty room.\n There is", 3);
             
 
         }
@@ -68,33 +65,35 @@ namespace DungeonExplorer
                     (int)Math.Floor(_player.Health / (10 - (_depth * 0.5))));
                 room.Enemy = enemy;
             }
-
+            // This code determines if you will find any items and how many
             for (int i = 0; i < _random.Next(100) % 33; i++)
             {
                 bool treasureSpawn = _random.Next(100) < 30;
                 if (treasureSpawn)
                 {
-                    string type = itemTypes[_random.Next(itemTypes.Length)];
+                    string type = _itemTypes[_random.Next(_itemTypes.Length)];
                     switch (type)
                     {
                         case "Weapon":
+                            // Generates a weapon with a weighted random strength
                             var weaponDetails = LootTable.generateRarity();
-                            room.addItem(new Weapon(weaponDetails.Value + "Weapon", 
+                            room.addItem(new Weapon(weaponDetails.Value + " Sword", 
                                 weaponDetails.Key * _depth * 2));
                             break;
-                        // Logic here should likely be altered
+                        // For now Armour is a static increase
                         case "Armour":
-                            var armourDetails = LootTable.generateRarity();
-                            room.addItem(new Weapon(armourDetails.Value + "Weapon", 
-                                armourDetails.Key * _depth * 2));
+                            room.addItem(new Item("Armour"));
                             break;
+                        // Generate random type
                         case "Potion":
-                            string potionType = potionTypes[_random.Next(potionTypes.Length)];
+                            string potionType = _potionTypes[_random.Next(_potionTypes.Length)];
                             room.addItem(new Item(potionType + "Potion"));
                             break;
+                        // Treasure is just a generic collectable
                         case "Treasure":
                             _player.AddTreasure();
                             break;
+                        // This shouldn't be thrown ever
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
@@ -104,8 +103,8 @@ namespace DungeonExplorer
 
             return room;
         }
-
-        public void printInfo(Room room)
+        // Basic description of the room
+        private void PrintInfo(Room room)
         {
             Console.WriteLine($"Name: {_player.Name}\tHealth: {_player.Health}\nInfo: {room.getDescription()}");
             if (room.getItems().Count == 0) {return;}
@@ -116,19 +115,20 @@ namespace DungeonExplorer
             }
         }
         
-        
+        // Main game loop, can be split into 3 sections: fight, loot, navigate
         public void Start()
         {
-            bool playing = true;
-            while (playing)
+            while (_playing)
             {
+                // If empty room then escape, line 47 determines the probability
                 Room room = GenerateRoom();
-                if (room.getDescription() == "")
+                if (room.getPaths().Count == 0)
                 {
-                    playing = false;
+                    _playing = false;
                     return;
                 }
-                printInfo(room);
+                PrintInfo(room);
+                // If an enemy is present begin the fight
                 if (room.Enemy != null) {  Console.WriteLine($"You have encountered a {room.Enemy.name}"); }
                 while (room.Enemy != null)
                 {
@@ -153,7 +153,7 @@ namespace DungeonExplorer
                     {
                         Weapon weapon = (Weapon)chosen;
                         int taken = room.Enemy.takeDamage(
-                            (int) Math.Floor(weapon.getDamage() * (1 + _player.GetDamageModifier())));
+                            (int) Math.Floor(weapon.GetDamage() * (1 + _player.GetDamageModifier())));
                         Console.WriteLine($"You attack and the enemy loses {taken} health!");
                     }
                     else if (chosen.GetType() == typeof(Potion))
@@ -183,8 +183,13 @@ namespace DungeonExplorer
                         break;
                     }
                     
-                    int dealt = Math.Max(room.Enemy.damage - _player.Health, 0);
+                    int dealt = Math.Max(room.Enemy.damage - _player.Armor, 0);
                     Console.WriteLine($"The enemy attacks and deals {dealt} damage!\n");
+                    if (_player.Health <= 0)
+                    {
+                        Console.WriteLine("You have lost all health!");
+                        Environment.Exit(0);
+                    }
                    
                     
                 }
@@ -208,11 +213,18 @@ namespace DungeonExplorer
 
                     foreach (Item item in items)
                     {
-                        _player.PickUpItem(item);
+                        if (item.getName() == "Armour")
+                        {
+                            _player.Armor += 4;
+                        }
+                        else
+                        {
+                            _player.PickUpItem(item);
+                        }
                     }
                 }
                 
-                printInfo(room);
+                PrintInfo(room);
                 Console.WriteLine("Where would you like to go? : ");
                 bool invalidX = true;
                 while (invalidX)

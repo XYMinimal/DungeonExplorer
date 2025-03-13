@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DungeonExplorer.Tests;
 
 namespace DungeonExplorer
 {
@@ -10,6 +7,12 @@ namespace DungeonExplorer
     {
         static void Main(string[] args)
         {
+            
+           
+            EnemyTests.TestEnemyAttacked();
+            EnemyTests.TestPlayerAttacked();
+        
+            Console.WriteLine("Tests finished");
             Game game = new Game();
             game.Start();
             Console.WriteLine("Waiting for your Implementation");

@@ -1,21 +1,20 @@
-﻿namespace DungeonExplorer
+﻿namespace DungeonExplorer.Items
 {
     public class Weapon : Item
     {
-        private int damage;
-        private string type;
+        private readonly int _damage;
         
         public Weapon(string name, int damage) : base(name)
         {
-            this.damage = damage;
+            _damage = damage;
             
         }
 
-        public int getDamage() { return damage; }
+        public int GetDamage() { return _damage; }
 
-        private int calculateDamage(int armour)
+        public int CalculateDamage(int armour)
         {
-            return damage - armour;
+            return _damage - armour;
         }
     }
 }
