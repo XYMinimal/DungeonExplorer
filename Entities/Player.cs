@@ -1,27 +1,33 @@
-﻿using System.Collections.Generic;
-using DungeonExplorer.Entities;
+﻿using System;
+using System.Collections.Generic;
 using DungeonExplorer.Items;
 
 namespace DungeonExplorer.Entities
 {
     public class Player : Creature
     {
-        private float _damageModifier;
-        public Weapon Weapon { get; set; }
-        private List<Item> _inventory = new List<Item>();
+        public float DamageModifier { get; set; }
+        public int WeaponDamage { get; set; }
+        public int DamageResistance { get; set; }
+        public float GuardEffectiveness { get; set; }
+        
+        public Inventory Inventory { get; } = new Inventory();
+        
         private int _treasureCount = 0;
 
         public Player(string name, int health) : base(name, health)
         {
-            _damageModifier = 0;
+            DamageModifier = 0;
         }
         public void PickUpItem(Item item)
         {
-            _inventory.Add(item);
+            Inventory.AddItem(item);
         }
-        public List<Item> InventoryContents()
+
+        public void DropItem(Item item)
         {
-            return _inventory;
+            Inventory.RemoveItem(item);
+            AddTreasure();
         }
 
         public void AddTreasure()
@@ -31,12 +37,22 @@ namespace DungeonExplorer.Entities
 
         public void SetDamageModifier(float modifier)
         {
-            _damageModifier = modifier;
+            DamageModifier = modifier;
+        }
+
+        public override int Attack(float modifier)
+        {
+            return (int) Math.Floor((3 + WeaponDamage) * DamageModifier * modifier);
         }
 
         public override void Heal(int amount)
         {
             Health += amount;
+        }
+
+        public override void Guard()
+        {
+            Console.WriteLine($"{Name} guards, damage taken will be reduced");
         }
     }
 }

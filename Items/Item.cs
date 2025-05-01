@@ -1,15 +1,13 @@
-﻿namespace DungeonExplorer
+﻿namespace DungeonExplorer.Items
 {
     public class Item
     {
-        private readonly string name;
+        public readonly string Name;
 
         public Item(string name)
         {
-            this.name = name;
+            Name = name;
         }
         
-        public string GetName
-            () {return name;}
     }
 }

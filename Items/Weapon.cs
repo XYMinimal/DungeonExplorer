@@ -1,20 +1,27 @@
-﻿namespace DungeonExplorer.Items
+﻿using DungeonExplorer.Entities;
+
+namespace DungeonExplorer.Items
 {
-    public class Weapon : Item
+    public class Weapon : Item, IEquipable
     {
         private readonly int _damage;
+        public bool IsEquipped { get; private set; }
         
         public Weapon(string name, int damage) : base(name)
         {
             _damage = damage;
-            
+        }
+        
+        public void Equip(Player player)
+        {
+            player.WeaponDamage =  _damage;
+            IsEquipped = true;
         }
 
-        public int GetDamage() { return _damage; }
-
-        public int CalculateDamage(int armour)
+        public void Unequip(Player player)
         {
-            return _damage - armour;
+            player.WeaponDamage = 0;
+            IsEquipped = false;
         }
     }
 }

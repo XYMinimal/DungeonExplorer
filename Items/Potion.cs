@@ -1,4 +1,4 @@
-﻿namespace DungeonExplorer
+﻿namespace DungeonExplorer.Items
 {
     public class Potion : Item
     {
