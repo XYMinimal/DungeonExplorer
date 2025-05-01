@@ -183,7 +183,7 @@ namespace DungeonExplorer
                         break;
                     }
                     
-                    int dealt = Math.Max(room.Enemy.damage - _player.Armor, 0);
+                    int dealt = Math.Max(room.Enemy.Damage - _player.Armor, 0);
                     Console.WriteLine($"The enemy attacks and deals {dealt} damage!\n");
                     if (_player.Health <= 0)
                     {

@@ -1,22 +1,18 @@
 ﻿using System.Collections.Generic;
+using DungeonExplorer.Entities;
 using DungeonExplorer.Items;
 
-namespace DungeonExplorer
+namespace DungeonExplorer.Entities
 {
-    public class Player
+    public class Player : Creature
     {
-        public string Name { get; private set; }
-        public int Health { get; private set; }
         private float _damageModifier;
         public Weapon Weapon { get; set; }
-        public int Armor { get; set; }
         private List<Item> _inventory = new List<Item>();
         private int _treasureCount = 0;
 
-        public Player(string name, int health) 
+        public Player(string name, int health) : base(name, health)
         {
-            Name = name;
-            Health = health;
             _damageModifier = 0;
         }
         public void PickUpItem(Item item)
@@ -38,14 +34,9 @@ namespace DungeonExplorer
             _damageModifier = modifier;
         }
 
-        public void SetHealth(int health)
+        public override void Heal(int amount)
         {
-            Health = health;
-        }
-
-        public float GetDamageModifier()
-        {
-            return _damageModifier;
+            Health += amount;
         }
     }
 }
