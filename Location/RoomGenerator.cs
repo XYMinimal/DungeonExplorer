@@ -22,19 +22,12 @@ namespace DungeonExplorer.Location
         // Main function for creating rooms, items and enemies
         public static Room GenerateRoom(string[] itemTypes, string[] potionTypes, int depth, Player player)
         {
-            Room room = new Room("", Random.Next(2) + 1);
-            // This code determines if the player has found an exit, the chance increases the more rooms you explore
-            bool escape = Random.Next(100) < (5 * Math.Log(depth));
-            if (escape)
-            {
-                Console.WriteLine("You escaped in " + depth + " rooms!");
-                return room;
-            }
-            // This code is responsible for determining if an enemy will spawn
-            // as well as the stats, Stats increase with depth
+            Room room = new Room();
+            // I've changed how escaping works to now have a predetermined random exit point, see GameMap.cs
+            
             if (Random.Next(100) < 50)
             {
-                int depthModifier = (int) Math.Floor(Math.Pow(3, depth / 10.0));
+                int depthModifier = (int) Math.Floor(1 + (0.15 * depth));
                 room.Enemy = EnemyGenerator.GetRandomEnemy(depthModifier);
             }
             // This code determines if you will find any items and how many
@@ -48,18 +41,21 @@ namespace DungeonExplorer.Location
                     {
                         case "Weapon":
                             // Generates a weapon with a weighted random strength
-                            var weaponDetails = LootTable.generateRarity();
-                            room.AddItem(new Weapon(weaponDetails.Value + " Sword", 
-                                weaponDetails.Key * depth * 2));
+                            var weaponQuality = LootTable.generateRarity();
+                            room.AddItem(new Weapon(weaponQuality.Value + " Sword", 
+                                (weaponQuality.Key + 1) * depth * 2));
                             break;
                         // For now Armour is a static increase
                         case "Armour":
-                            room.AddItem(new Item("Armour"));
+                            var armourQuality = LootTable.generateRarity();
+                            room.AddItem(new Armour(armourQuality.Value + " Armour",
+                                (armourQuality.Key + 1) * depth * 2, 
+                                Random.Next(5 * (armourQuality.Key) + 1) - 10 + depth)); 
                             break;
                         // Generate random type
                         case "Potion":
                             string potionType = potionTypes[Random.Next(potionTypes.Length)];
-                            room.AddItem(new Item(potionType + "Potion"));
+                            room.AddItem(new Potion($"{potionType} Potion", potionType));
                             break;
                         // Treasure is just a generic collectable
                         case "Treasure":

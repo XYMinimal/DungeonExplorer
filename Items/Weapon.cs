@@ -23,5 +23,7 @@ namespace DungeonExplorer.Items
             player.WeaponDamage = 0;
             IsEquipped = false;
         }
+        
+        public int Damage => _damage;
     }
 }

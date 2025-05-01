@@ -13,10 +13,16 @@ namespace DungeonExplorer.Logic
 
         public FightLoop(Enemy enemy, Player player)
         {
-            _enemy = enemy;
-            _player = player;
+            // Null check because this kept breaking
+            _enemy = enemy ?? throw new ArgumentNullException(nameof(enemy));
+            _player = player ?? throw new ArgumentNullException(nameof(player));
+
+            if (_enemy.Strategy == null)
+            {
+                throw new ArgumentException("Strategy is null for some reason");
+            }
             
-            Console.WriteLine($"You have encountered {enemy.Name}!");
+            Console.WriteLine($"You have encountered {_enemy.Name}!");
             Console.WriteLine($"{_enemy.Strategy.Name}:\n\t{_enemy.Strategy.Description}");
         }
 
@@ -25,9 +31,9 @@ namespace DungeonExplorer.Logic
             Console.WriteLine($"{_enemy.Name}:\t{_enemy.Health} / {_enemy.MaxHealth}");
         }
 
-        private int CalculateDamage(int damage, bool isGuarding)
+        public static int CalculateDamage(int damage, bool isGuarding, float guardingEffectiveness, int damageReduction)
         {
-            return (int) Math.Floor(damage * (isGuarding ? 0.4 : 1));
+            return (int) Math.Floor(damage * (isGuarding ? 1 - guardingEffectiveness: 1)) - damageReduction;
         }
 
         private void PlayerTurn()
@@ -52,7 +58,7 @@ namespace DungeonExplorer.Logic
             {
                 case 1:
                     int damageDealt = Math.Min(CalculateDamage(_player.Attack(1f), 
-                        _enemy.IsGuarding), _enemy.Health);
+                        _enemy.IsGuarding, 0.4f, 0), _enemy.Health);
                     Console.WriteLine($"You successfully dealt {damageDealt} damage.");
                     _enemy.Health -= damageDealt;
                     break;
@@ -66,6 +72,7 @@ namespace DungeonExplorer.Logic
                     {
                         Console.WriteLine($"{index}: {potion.Name}");
                     }
+                    UsePotion();
                     break;
                 default:
                     throw new Exception("This shouldn't happen.");
@@ -121,19 +128,22 @@ namespace DungeonExplorer.Logic
             
             if (enemyDamage == -1) { return; }
             
-            int finalDamage = Math.Min(_player.Health, CalculateDamage(enemyDamage, _player.IsGuarding));
+            int finalDamage = Math.Min(_player.Health, CalculateDamage(enemyDamage, _player.IsGuarding, _player.GuardEffectiveness, _player.DamageResistance));
             Console.WriteLine($"You took {finalDamage} damage!");
             _player.Health -= finalDamage;
+            
+            _enemy.Health = Math.Min(_enemy.MaxHealth, _enemy.Health);
         }
 
-        public bool engage()
+        public bool Engage()
         {
             while (true)
             {
                 Fight();
                 // Manage win / loss cons, false == you lose, true == you won
                 if (_enemy.Health <= 0)
-                {
+                {   
+                    _player.Health = Math.Max(_player.Health, 70);
                     Console.WriteLine($"You defeated {_enemy.Name}!");
                     return true;
                 }

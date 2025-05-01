@@ -28,5 +28,8 @@ namespace DungeonExplorer.Items
             player.DamageResistance = 0;
         }
         
+        public int DamageResistance => _damageResistance;
+        public float GuardEffectiveness => _guardEffectiveness;
+        
     }
 }

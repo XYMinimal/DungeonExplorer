@@ -13,11 +13,11 @@ namespace DungeonExplorer.Entities
         
         public Inventory Inventory { get; } = new Inventory();
         
-        private int _treasureCount = 0;
+        public int TreasureCount = 0;
 
         public Player(string name, int health) : base(name, health)
         {
-            DamageModifier = 0;
+            DamageModifier = 1;
         }
         public void PickUpItem(Item item)
         {
@@ -32,7 +32,7 @@ namespace DungeonExplorer.Entities
 
         public void AddTreasure()
         {
-            _treasureCount++;
+            TreasureCount++;
         }
 
         public void SetDamageModifier(float modifier)
@@ -42,12 +42,12 @@ namespace DungeonExplorer.Entities
 
         public override int Attack(float modifier)
         {
-            return (int) Math.Floor((3 + WeaponDamage) * DamageModifier * modifier);
+            return (int) Math.Floor((6 + WeaponDamage) * DamageModifier * modifier);
         }
 
         public override void Heal(int amount)
         {
-            Health += amount;
+            Health = Math.Min(MaxHealth, Health + amount);
         }
 
         public override void Guard()

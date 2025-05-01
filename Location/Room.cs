@@ -12,17 +12,13 @@ namespace DungeonExplorer
         private readonly List<Item> _items;
         private readonly string[] _paths =  {"forward", "left", "right"};
         private readonly int _pathCount;
+        public bool Explored { get; set; } = false;
         public Enemy Enemy {get;set;}
 
-        public Room(string description, int pathCount)
+        public Room()
         {
             _items = new List<Item>();
-            _pathCount = pathCount;
-            _description = description + $"\nThere are {pathCount} paths: ";
-            for (int i = 0; i < pathCount; i++)
-            {
-                _description += $"\n\t{i}. {_paths[i]}";
-            }
+            _description = Explored ? "You enter an empty room" : "You discover a new room!";
 
         }
 

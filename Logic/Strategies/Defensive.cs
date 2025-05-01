@@ -10,9 +10,9 @@ namespace DungeonExplorer.Logic.Strategies
 
         public int Enact(Enemy enemy, Player player)
         {
-            if (enemy.Health <= (enemy.MaxHealth / 2))
+            if (enemy.Health <= enemy.MaxHealth / 2 && enemy.HealCount > 0)
             {
-                enemy.Heal((int)Math.Floor(enemy.Health * 1.3));
+                enemy.Heal((int)Math.Floor(enemy.Health * 0.3));
             }
             else if (enemy.Health <= enemy.MaxHealth * 0.7)
             {

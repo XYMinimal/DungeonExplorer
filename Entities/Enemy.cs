@@ -6,6 +6,8 @@ namespace DungeonExplorer.Entities
     {
         public IAttackStrategy Strategy { get; }
         public int Damage { get; }
+        // Defensive and Desperate enemies would just infinitely heal, so I had to add a limit
+        public int HealCount { get; set; } = 3;
 
 
         public Enemy(string name, int health, IAttackStrategy strategy, int damage) : base(name, health)
@@ -21,9 +23,10 @@ namespace DungeonExplorer.Entities
 
         public override void Heal(int amount)
         {
-            int healValue = Math.Max(MaxHealth, amount);
+            int healValue = Math.Min(MaxHealth, amount);
             Console.WriteLine($"{Name} heals {healValue} health!");
             Health += healValue;
+            HealCount--;
         }
 
         public override void Guard()

@@ -8,7 +8,7 @@ namespace DungeonExplorer
     public class Inventory
     {
         private List<Item> _contents = new List<Item>();
-        private const int MaxSize = 20;
+        private const int MaxSize = 999;
 
         public void AddItem(Item item)
         {
@@ -20,16 +20,28 @@ namespace DungeonExplorer
             _contents.Remove(item);
         }
 
-        // This method is unused now, but I thought I would leave it in because I haven't used a big LinQ ordering anywhere else
-        public void Sort()
+        // This method is mostly unused now, but I thought I would leave it in because I haven't used a big LinQ ordering anywhere else
+        public List<Item> Sort(List<Item> items)
         {
-            _contents = _contents.OrderBy(item =>
+            List<Item> output = items.OrderBy(item =>
             {
                 if (item is Weapon weapon && weapon.IsEquipped) return 0;
                 if (item is Armour armour && armour.IsEquipped) return 1;
                 if (item is Potion) return 2;
-                return 3;
+                if (item is Armour armour2 && !armour2.IsEquipped) return 3;
+                return 4;
             }).ThenBy(item => item.Name).ToList();
+            return output;
+        }
+
+        public List<Item> GetUnequiped()
+        {
+            return _contents.Where(item => (item is Weapon weapon && !weapon.IsEquipped) || (item is Armour armour && !armour.IsEquipped)).ToList();
+        }
+
+        public Item GetEquipped(Type type)
+        {
+            return _contents.FirstOrDefault(item => item.GetType() == type && item is IEquipable equipable && equipable.IsEquipped);
         }
         
 

@@ -21,7 +21,7 @@ namespace DungeonExplorer.Logic.Strategies
                 return -1;
             }
             
-            enemy.Heal((int)Math.Floor(enemy.Health * 1.3));
+            enemy.Heal((int)Math.Floor(enemy.Health * 0.1 * enemy.HealCount));
             return -1;
         }
     }
